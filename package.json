@@ -1,0 +1,42 @@
+{
+  "name": "fuel-web3-provider",
+  "version": "1.0.0",
+  "description": "Web3 provider for interacting with meta-tx fueling service",
+  "main": "./dist/fuelWeb3Provider.node.js",
+  "browser": "./dist/fuelWeb3Provider.js",
+  "scripts": {
+    "build": "npm run build-dist && npm run build-dist-prod",
+    "build-dist": "webpack --config webpack.config.js",
+    "build-dist-prod": "webpack --config webpack.prod.js",
+    "test": "jest --forceExit --coverage --verbose"
+  },
+  "author": "Abdallah-Hossayn Mokhtar Bacha <mokhtar@kantum.xyz>",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "axios": "^0.18.0",
+    "babel-loader": "^8.0.0-beta.4",
+    "bluebird": "^3.5.1",
+    "eth-sig-util": "^1.2.1",
+    "eth-signer": "^0.3.4",
+    "ethereumjs-util": "^5.1.1",
+    "ethjs": "^0.2.6",
+    "js-scrypt": "^0.2.0",
+    "request": "^2.85.0",
+    "uport-identity": "^2.0.1",
+    "util": "^0.11.0",
+    "web3": "^1.0.0-beta.33",
+    "web3-provider-engine": "^14.0.5",
+    "webpack-cli": "^3.0.8",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "chai": "^4.1.2",
+    "nodemon": "^1.13.0",
+    "source-map-loader": "^0.2.3",
+    "webpack": "^4.14.0"
+  }
+}

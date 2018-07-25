@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.com/Frontier-project/FrontierJS.svg?token=DJeMzxJJncp3nRaEUuxH&branch=master)](https://travis-ci.com/Frontier-project/FrontierJS)
 
-# FuelWeb3Provider
+# fuel-web3-provider
 
 ## Integrate Fuel in your Dapp
 
@@ -87,4 +87,9 @@ targetContract.methods
 ```
 
 [Here](https://github.com/ahmb84/fuel-node-example) you will can find a reference implementation.
+
+## Demo
+
+![Alt Text](https://media.giphy.com/media/5BPWeEFH2Aqo4Xv6no/giphy.gif)
+
 

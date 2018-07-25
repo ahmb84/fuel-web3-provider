@@ -8,14 +8,14 @@ FuelWeb3Provider provides a simple way for you to integrate Fuel service into yo
 
 ## What is Fuel?
 
-Fuel is strongly inspired by [Sensui](https://github.com/ConsenSys/lambda-sensui), the [uPort](https://uport.me) tx funding service, and his meta-transaction system conceived by Dr. Christian Lundkvist. Sensui works just for uPort users, Fuel enable developers to add a funding system to his Dapp and so make transactions feesless for the end user.
+Fuel is strongly inspired by [Sensui](https://github.com/ConsenSys/lambda-sensui), the [uPort](https://uport.me) transactions funding service, and his meta-transaction system conceived by Dr. Christian Lundkvist. Sensui works just for uPort users, Fuel enable developers to add a funding system to his Dapp and so make transactions feesless for the end user.
 
 ## Install
 
 You can install the library via `npm`:
 
 ```javascript
-npm i @ahmb84/fuel-web3-provider
+npm i fuel-web3-provider
 ```
 
 ## Smart Contract Compatibality
@@ -33,8 +33,8 @@ In your application you must first configure your FrontierJS object. The constru
 | Param              | Description                                                          |
 | ------------------ | -------------------------------------------------------------------- |
 | `privateKey`       | Your private Ethreum key                                             |
-| `rpcUrl`           | An Ethreum node RPC uri, providing access to the Ethereum Blockchain |
-| `fuelUrl`          | The uri of a fuel server                                             |
+| `rpcUrl`           | An Ethreum node RPC uri, providing access to Ethereum for now it should be websocket |
+| `fuelUrl`          | The uri of the fuel server                                             |
 | `network`          | Mainnet, Rinkeby, Kovan, or Ropsten                                  |
 | `txRelayAddress`   | The address of the contract relayer                                  |
 | `txSenderAddress`  | The address of the sender of the transaction, the gas provider       |
@@ -43,14 +43,25 @@ In your application you must first configure your FrontierJS object. The constru
 ## Usage
 
 In order to use it, just import the library and pass the previous params in the constructor.
+By default the library is loaded with the following value, so you just have to pass a private key and then you can start to use Fuel.
 
 ```javascript
 import Web3 from 'web3';
-import FuelProvider from '@ahmb84/web3-fuel-provider';
+import FuelProvider from 'web3-fuel-provider';
 import targetContractAbi from './targetContractAbi.json';
-const privateKey = '0x0000000';
 
-const fuelProvider = new FuelProvider(privateKey);
+const fuelProvider = new FuelProvider(
+  {
+    privateKey: "YOUR_PRIVATE_KEY",
+    rpcUrl: 'wss://rinkeby.infura.io/ws',
+    fuelUrl: 'https://bagas.app/api/relay',
+    network: 'rinkeby',
+    txRelayAddress: '0xda8c6dce9e9a85e6f9df7b09b2354da44cb48331',
+    txSenderAddress: '0x00B8FBD65D61b7DFe34b9A3Bb6C81908d7fFD541',
+    whiteListAddress: '0x0000000000000000000000000000000000000000'
+  }
+)
+
 ```
 
 And then pass the provider to web3 use it in the normal way.
@@ -76,3 +87,4 @@ targetContract.methods
 ```
 
 [Here](https://github.com/ahmb84/fuel-node-example) you will can find a reference implementation.
+

@@ -18,13 +18,14 @@ const KeyPair = BlueBird.promisifyAll(EthSigner.generators.KeyPair)
 
 class Provider {
   constructor (
-    privateKey,
-    rpcUrl = 'wss://rinkeby.infura.io/ws',
-    fuelUrl = 'http://localhost:6000/relay',
-    network = 'rinkeby',
-    txRelayAddress = '0xda8c6dce9e9a85e6f9df7b09b2354da44cb48331',
-    txSenderAddress = '0x00B8FBD65D61b7DFe34b9A3Bb6C81908d7fFD541',
-    whiteListAddress = '0x0000000000000000000000000000000000000000'
+    { privateKey,
+      rpcUrl = 'wss://rinkeby.infura.io/ws',
+      fuelUrl = 'https://bagas.app/api/relay',
+      network = 'rinkeby',
+      txRelayAddress = '0xda8c6dce9e9a85e6f9df7b09b2354da44cb48331',
+      txSenderAddress = '0x00B8FBD65D61b7DFe34b9A3Bb6C81908d7fFD541',
+      whiteListAddress = '0x0000000000000000000000000000000000000000'
+    }
   ) {
     this.rpcUrl = rpcUrl
     this.fuelUrl = fuelUrl
@@ -60,7 +61,7 @@ class Provider {
     engine.addProvider(new CacheSubprovider())
     engine.addProvider(new FilterSubprovider())
     engine.addProvider(new NonceTrackerSubprovider())
-    engine.addProvider(new VmSubprovider())
+    // engine.addProvider(new VmSubprovider())
     engine.addProvider(
       new HookedWalletSubprovider({
         getAccounts: (cb) => {

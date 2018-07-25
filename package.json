@@ -1,6 +1,6 @@
 {
   "name": "fuel-web3-provider",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Web3 provider for interacting with meta-tx fueling service",
   "main": "./dist/fuelWeb3Provider.node.js",
   "browser": "./dist/fuelWeb3Provider.js",
@@ -17,6 +17,7 @@
     "@babel/preset-env": "^7.0.0-beta.51",
     "axios": "^0.18.0",
     "babel-loader": "^8.0.0-beta.4",
+    "bignumber.js": "^7.2.1",
     "bluebird": "^3.5.1",
     "eth-sig-util": "^1.2.1",
     "eth-signer": "^0.3.4",

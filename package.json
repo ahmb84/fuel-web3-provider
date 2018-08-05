@@ -1,11 +1,11 @@
 {
   "name": "fuel-web3-provider",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "Web3 provider for interacting with meta-tx fueling service",
   "main": "./dist/fuelWeb3Provider.node.js",
   "browser": "./dist/fuelWeb3Provider.js",
   "scripts": {
-    "build": "npm run build-dist && npm run build-dist-prod",
+    "build": "npm run build-dist",
     "build-dist": "webpack --config webpack.config.js",
     "build-dist-prod": "webpack --config webpack.prod.js",
     "test": "jest --forceExit --coverage --verbose"

@@ -1,6 +1,6 @@
 'use strict'
 const Subprovider = require('./subprovider')
-const WebSocket = global.WebSocket || require('ws')
+const WebSocket = window.WebSocket
 const axios = require('axios')
 const Backoff = require('backoff')
 const EventEmitter = require('events')

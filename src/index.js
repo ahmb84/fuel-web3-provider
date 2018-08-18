@@ -1,6 +1,5 @@
 const BlueBird = require('bluebird')
 const Transaction = require('ethereumjs-tx')
-const EthSigner = require('eth-signer')
 const UportIdentity = require('uport-identity')
 const Web3 = require('web3')
 const ProviderEngine = require('web3-provider-engine')
@@ -14,15 +13,16 @@ const WsSubprovider = require('./services/wsSubprovider')
 const HttpSubprovider = require('./services/httpSubprovider.js')
 
 const engine = new ProviderEngine()
-const TxRelaySigner = EthSigner.signers.TxRelaySigner
+const TxRelaySigner = require('./services/eth-signer/txRelaySigner')
 const txRelayArtifact = UportIdentity.TxRelay.v2
-const KeyPair = BlueBird.promisifyAll(EthSigner.generators.KeyPair)
+const KeyPair = require('./services/eth-signer/generators/keyPair')
 
 class Provider {
   constructor (
     { privateKey,
-      rpcUrl = 'wss://rinkeby.infura.io/ws',
-      fuelUrl = 'https://bagas.app/api/relay',
+      web3Provider,
+      rpcUrl = 'https://rinkeby.infura.io/',
+      fuelUrl = 'http://localhost:5000/relay',
       network = 'rinkeby',
       txRelayAddress = '0xda8c6dce9e9a85e6f9df7b09b2354da44cb48331',
       txSenderAddress = '0x00B8FBD65D61b7DFe34b9A3Bb6C81908d7fFD541',
@@ -35,19 +35,28 @@ class Provider {
     this.txRelayAddress = txRelayAddress
     this.txSenderAddress = txSenderAddress
     this.whiteListAddress = whiteListAddress
-    this.web3 = new Web3(rpcUrl)
-    this.TxRelay = BlueBird.promisifyAll(
-      new this.web3.eth.Contract(txRelayArtifact.abi, txRelayAddress)
+    this.isWeb3Provided = web3Provider !== undefined
+    this.web3 = ((this.isWeb3Provided === true) ? new Web3(web3Provider.currentProvider) : new Web3(rpcUrl))
+    this.asyncWeb3 = BlueBird.promisifyAll(this.web3.eth)
+    this.TxRelay = BlueBird.promisifyAll(new this.web3.eth.Contract(txRelayArtifact.abi, txRelayAddress))
+    this.senderKeyPair = {}
+    if (this.isWeb3Provided === true) {
+      this.senderKeyPair.address = window.web3.eth.defaultAccount
+    } else if (privateKey !== undefined) {
+      this.senderKeyPair = KeyPair.fromPrivateKey(privateKey)
+    } else {
+      throw new Error('A web instance, or a private key, should be passed')
+    }
+    this.txRelaySigner = new TxRelaySigner(
+      this.senderKeyPair,
+      this.txRelayAddress,
+      this.txSenderAddress,
+      this.whiteListAddress
     )
-    this.senderKeyPair = KeyPair.fromPrivateKey(privateKey)
-    this.txRelaySigner = BlueBird.promisifyAll(
-      new TxRelaySigner(
-        this.senderKeyPair,
-        this.txRelayAddress,
-        this.txSenderAddress,
-        this.whiteListAddress
-      )
-    )
+    this.signFunction = async (hash) => {
+      const sig = await this.asyncWeb3.signAsync(hash, this.senderKeyPair.address)
+      return sig
+    }
     this.start = this.start
   }
   start () {
@@ -67,29 +76,35 @@ class Provider {
     engine.addProvider(
       new HookedWalletSubprovider({
         getAccounts: (cb) => {
+          console.log(this.senderKeyPair.address)
           cb(null, [this.senderKeyPair.address])
         },
         getPrivateKey: (cb) => {
           cb(null, this.senderKeyPair.privateKey)
         },
-        signTransaction: async (txParams) => {
+        signTransaction: async (txParams, callback) => {
           const txRelayNonce = await this.TxRelay.methods
-            .getNonce(this.senderKeyPair.address)
-            .call({ from: this.senderKeyPair.address })
+            .getNonce(this.senderKeyPair.address).call()
           txParams.nonce = Web3.utils.toHex(txRelayNonce)
           const tx = new Transaction(txParams)
           const rawTx = '0x' + tx.serialize().toString('hex')
-          const metaSignedTx = await this.txRelaySigner.signRawTxAsync(rawTx)
+          let metaSignedTx
+          if (this.isWeb3Provided === true) {
+            metaSignedTx = await this.txRelaySigner.signRawTx(rawTx, this.signFunction)
+          } else {
+            metaSignedTx = await this.txRelaySigner.signRawTx(rawTx)
+          }
           const params = {
             metaNonce: txParams.nonce,
             metaSignedTx,
             blockchain: this.network
           }
-          return (null, params)
+          console.log(params)
+          callback(null, params)
         }
       })
     )
-  
+
     const connectionType = getConnectionType(this.rpcUrl)
 
     if (connectionType === 'ws') {
@@ -121,7 +136,7 @@ class Provider {
   }
 }
 
-function getConnectionType(rpcUrl) {
+function getConnectionType (rpcUrl) {
   if (!rpcUrl) return undefined
 
   const protocol = rpcUrl.split(':')[0]
@@ -136,6 +151,5 @@ function getConnectionType(rpcUrl) {
       throw new Error(`ProviderEngine - unrecognized protocol in "${rpcUrl}"`)
   }
 }
-
 
 module.exports = Provider

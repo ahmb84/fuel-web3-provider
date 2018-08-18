@@ -1,4 +1,4 @@
-const xhr = process.browser ? require('xhr') : require('request')
+const xhr = require('xhr')
 const inherits = require('util').inherits
 const createPayload = require('web3-provider-engine/util/create-payload.js')
 const Subprovider = require('./subprovider.js')
